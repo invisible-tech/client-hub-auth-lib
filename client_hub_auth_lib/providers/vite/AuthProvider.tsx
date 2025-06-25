@@ -8,6 +8,9 @@ import React, {
 import { jwtDecode } from "jwt-decode"
 import { toast } from "sonner"
 
+const JWT_ISSUER = import.meta.env.VITE_JWT_ISSUER
+const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI
+
 type AuthContextType = {
   accessToken: string | null
   isAuthenticated: boolean
@@ -27,7 +30,7 @@ export const useClientHubAuth = () => {
 }
 
 const exchangeCodeWithTokens = async (code: string) => {
-  const response = await fetch("http://localhost:8000/token/", {
+  const response = await fetch(`${JWT_ISSUER}/token/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -108,7 +111,7 @@ export function ClientHubAuthProvider({
     }
 
     try {
-      const response = await fetch("http://localhost:8000/refresh/", {
+      const response = await fetch(`${JWT_ISSUER}/refresh/`, {
         method: "POST",
         // credentials: "include",
         headers: {
@@ -137,7 +140,7 @@ export function ClientHubAuthProvider({
     isAuthenticated: !!accessToken,
     login: () => {
       window.location.assign(
-        `http://localhost:8000/login/?redirect_uri=http://localhost:5173`
+        `${JWT_ISSUER}/login/?redirect_uri=${REDIRECT_URI}`
       )
     },
     setAccessToken,
