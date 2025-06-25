@@ -4,5 +4,8 @@
   "description": "Client Hub Auth Library",
   "exports": {
     "./provider/vite": "./client_hub_auth_lib/providers/vite/AuthProvider.tsx"
+  },
+  "dependencies": {
+    "jwt-decode": "^4.0.0"
   }
 }

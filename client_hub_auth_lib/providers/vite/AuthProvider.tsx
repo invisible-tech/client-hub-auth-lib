@@ -113,7 +113,6 @@ export function ClientHubAuthProvider({
     try {
       const response = await fetch(`${JWT_ISSUER}/refresh/`, {
         method: "POST",
-        // credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
