@@ -10,3 +10,6 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.dependencies]
 python = "^3.11"
+django-authlib = "^0.17.2"
+authlib = "^1.5.1"
+requests = "^2.32.3"
