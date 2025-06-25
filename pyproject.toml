@@ -2,7 +2,7 @@
 name = "client-hub-auth-lib"
 version = "0.1.0"
 description = "Client Hub Auth Library"
-packages = [{include = "middlewares", from = "src"}]
+packages = [{include = "client-hub-auth-lib"}]
 
 [build-system]
 requires = ["poetry-core"]
