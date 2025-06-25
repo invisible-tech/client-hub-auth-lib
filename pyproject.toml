@@ -4,6 +4,10 @@ version = "0.1.0"
 description = "Client Hub Auth Library"
 readme = "README.md"
 
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry.dependencies]
 django-authlib = "^0.17.2"
 authlib = "^1.5.1"
