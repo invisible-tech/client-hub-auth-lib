@@ -1,0 +1,10 @@
+[tool.poetry]
+name = "client-hub-auth-lib"
+version = "0.1.0"
+description = "Client Hub Auth Library"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+django-authlib = "^0.17.2"
+authlib = "^1.5.1"
+requests = "^2.32.3"
