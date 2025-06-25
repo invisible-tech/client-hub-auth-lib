@@ -1,0 +1,8 @@
+{
+  "name": "client-hub-auth-lib",
+  "version": "0.1.0",
+  "description": "Client Hub Auth Library",
+  "exports": {
+    "./provider/vite": "./src/providers/vite/AuthProvider.tsx"
+  }
+}

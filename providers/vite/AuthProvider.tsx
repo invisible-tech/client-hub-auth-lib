@@ -1,0 +1,148 @@
+import React, {
+  createContext,
+  useEffect,
+  useState,
+  useContext,
+  useCallback,
+} from "react"
+import { jwtDecode } from "jwt-decode"
+import { toast } from "sonner"
+
+type AuthContextType = {
+  accessToken: string | null
+  isAuthenticated: boolean
+  login: () => void
+  setAccessToken: (token: string | null) => void
+  getAccessTokenSilently: () => Promise<string | null>
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
+export const useClientHubAuth = () => {
+  const context = useContext(AuthContext)
+  if (!context) {
+    throw new Error("useClientHubAuth must be used within an AuthProvider")
+  }
+  return context
+}
+
+const exchangeCodeWithTokens = async (code: string) => {
+  const response = await fetch("http://localhost:8000/token/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ code }),
+  })
+
+  if (!response.ok) {
+    throw new Error("Failed to exchange code for tokens")
+  }
+
+  const data = await response.json()
+  return data
+}
+
+export function ClientHubAuthProvider({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const [accessToken, setAccessTokenState] = useState<string | null>(null)
+
+  useEffect(() => {
+    const isCallbackRoute = window.location.pathname === "/auth/callback"
+
+    if (!isCallbackRoute) return
+
+    const params = new URLSearchParams(window.location.search)
+
+    const code = params.get("code")
+    if (!code) {
+      toast.error("No code found in callback URL!")
+      return
+    }
+    exchangeCodeWithTokens(code)
+      .then((data) => {
+        const { access_token: accessToken, refresh_token: refreshToken } = data
+        if (accessToken) {
+          setAccessToken(accessToken)
+        }
+
+        if (refreshToken) {
+          localStorage.setItem("refresh_token", refreshToken)
+        }
+        window.location.assign("/")
+      })
+      .catch(() => {
+        toast.error("Failed to exchange code for tokens")
+      })
+  }, [])
+
+  const setAccessToken = useCallback((token: string | null) => {
+    setAccessTokenState(token)
+  }, [])
+
+  const getAccessTokenSilently = async () => {
+    if (!accessToken || aboutToExpire(accessToken)) {
+      const token = await fetchRefreshToken()
+      return token
+    } else {
+      return accessToken
+    }
+  }
+
+  const aboutToExpire = (token: string, expirationBuffer = 10) => {
+    const decoded = jwtDecode(token)
+    if (decoded) {
+      return ((decoded.exp || 0) + expirationBuffer) * 1000 < Date.now()
+    } else {
+      return false
+    }
+  }
+
+  const fetchRefreshToken = async () => {
+    const refreshToken = localStorage.getItem("refresh_token")
+    if (!refreshToken) {
+      return null
+    }
+
+    try {
+      const response = await fetch("http://localhost:8000/refresh/", {
+        method: "POST",
+        // credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      })
+
+      if (!response.ok) {
+        console.error("Failed to fetch new access token")
+        return null
+      }
+
+      const data = await response.json()
+      setAccessToken(data.access_token)
+      localStorage.setItem("refresh_token", data.refresh_token)
+      return data.access_token
+    } catch (error) {
+      console.error("Error fetching new access token:", error)
+      return null
+    }
+  }
+
+  const value: AuthContextType = {
+    accessToken,
+    isAuthenticated: !!accessToken,
+    login: () => {
+      window.location.assign(
+        `http://localhost:8000/login/?redirect_uri=http://localhost:5173`
+      )
+    },
+    setAccessToken,
+    getAccessTokenSilently,
+  }
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+}
