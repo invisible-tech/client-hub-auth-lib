@@ -15,6 +15,7 @@ type AuthContextType = {
   accessToken: string | null
   isAuthenticated: boolean
   login: () => void
+  logout: () => void
   setAccessToken: (token: string | null) => void
   getAccessTokenSilently: () => Promise<string | null>
 }
@@ -141,6 +142,11 @@ export function ClientHubAuthProvider({
       window.location.assign(
         `${JWT_ISSUER}/login/?redirect_uri=${REDIRECT_URI}`
       )
+    },
+    logout: () => {
+      localStorage.removeItem("refresh_token")
+      setAccessToken(null)
+      window.location.assign("/")
     },
     setAccessToken,
     getAccessTokenSilently,
