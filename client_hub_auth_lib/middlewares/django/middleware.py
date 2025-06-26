@@ -9,12 +9,13 @@ class ClientHubAuthMiddleware:
 
     @classmethod
     def _get_jwks(cls):
+        """Get the JSON web key sets from the issuer"""
         response = requests.get(f"{config.JWT_ISSUER}/.well-known/jwks.json")
         response.raise_for_status()
         return response.json()
 
     def _get_user(self, token):
-        """Get """
+        """Get user info from the userinfo endpoint"""
         try:
             userinfo_url = f"{config.JWT_ISSUER}/api/user"
             headers = {"Authorization": f"Bearer {token}"}
