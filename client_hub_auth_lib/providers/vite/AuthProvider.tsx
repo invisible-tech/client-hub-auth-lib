@@ -11,11 +11,18 @@ import { toast } from "sonner"
 const JWT_ISSUER = import.meta.env.VITE_JWT_ISSUER
 const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI
 
+interface User {
+  name: string
+  email: string
+  picture?: string
+}
+
 type AuthContextType = {
   accessToken: string | null
   isAuthenticated: boolean
   login: () => void
   logout: () => void
+  user: User | null
   setAccessToken: (token: string | null) => void
   getAccessTokenSilently: () => Promise<string | null>
 }
@@ -53,6 +60,7 @@ export function ClientHubAuthProvider({
   children: React.ReactNode
 }) {
   const [accessToken, setAccessTokenState] = useState<string | null>(null)
+  const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
     const isCallbackRoute = window.location.pathname === "/auth/callback"
@@ -82,6 +90,39 @@ export function ClientHubAuthProvider({
         toast.error("Failed to exchange code for tokens")
       })
   }, [])
+
+  useEffect(() => {
+    const getUser = async (): Promise<User | null> => {
+      try {
+        const response = await fetch(`${JWT_ISSUER}/api/user`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+
+        if (!response.ok) {
+          console.error("Failed to fetch user info")
+          return null
+        }
+
+        const data = await response.json()
+        return {
+          name: data.name,
+          email: data.email,
+          picture: data.picture,
+        }
+      } catch (error) {
+        console.error("Error fetching user info:", error)
+        return null
+      }
+    }
+
+    getUser().then((data) => {
+      setUser(data)
+    })
+  }, [accessToken])
 
   const setAccessToken = useCallback((token: string | null) => {
     setAccessTokenState(token)
@@ -148,6 +189,7 @@ export function ClientHubAuthProvider({
       setAccessToken(null)
       window.location.assign("/")
     },
+    user,
     setAccessToken,
     getAccessTokenSilently,
   }
