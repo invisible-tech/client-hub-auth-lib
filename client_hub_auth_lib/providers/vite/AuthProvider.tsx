@@ -94,10 +94,8 @@ export function ClientHubAuthProvider({
   useEffect(() => {
     const getUser = async (): Promise<User | null> => {
       try {
-        const response = await fetch(`${JWT_ISSUER}/api/user`, {
-          method: "POST",
+        const response = await fetch(`${JWT_ISSUER}/api/user/`, {
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
           },
         })
