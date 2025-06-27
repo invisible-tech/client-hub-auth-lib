@@ -47,11 +47,10 @@ class ClientHubAuthMiddleware:
 
         if token:
             jwks = ClientHubAuthMiddleware._get_jwks()
-            current_jwk = JsonWebKey.import_key_set(jwks).find_by_kid(config.JWT_CURRENT_KID).as_dict(is_private=False)
-            key = JsonWebKey.import_key(current_jwk)
+            key_set = JsonWebKey.import_key_set(jwks)
             claims = pyJwt.decode(
                 token,
-                key,
+                key_set,
                 claims_options={
                     "iss": {"essential": True, "value": config.JWT_ISSUER},
                     "aud": {"essential": True, "value": config.JWT_AUDIENCE},
