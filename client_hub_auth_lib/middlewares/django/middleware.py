@@ -67,6 +67,6 @@ class ClientHubAuthMiddleware:
             request.auth0_authenticated = True
 
             user_info = self._get_user(token)
-            request.email = user_info.get("email")
+            request.email = user_info.get("email") if user_info else None
 
         return self.get_response(request)
