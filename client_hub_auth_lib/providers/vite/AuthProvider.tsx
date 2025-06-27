@@ -154,6 +154,7 @@ export function ClientHubAuthProvider({
   const fetchRefreshToken = async () => {
     const refreshToken = localStorage.getItem("refresh_token")
     if (!refreshToken) {
+      setAccessToken(null)
       return null
     }
 
@@ -168,6 +169,7 @@ export function ClientHubAuthProvider({
 
       if (!response.ok) {
         console.error("Failed to fetch new access token")
+        setAccessToken(null)
         return null
       }
 
@@ -177,6 +179,7 @@ export function ClientHubAuthProvider({
       return data.access_token
     } catch (error) {
       console.error("Error fetching new access token:", error)
+      setAccessToken(null)
       return null
     }
   }
