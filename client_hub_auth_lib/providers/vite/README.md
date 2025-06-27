@@ -16,6 +16,7 @@ React hook that provides access to authentication state and methods.
 {
   accessToken: string | null
   isAuthenticated: boolean
+  isLoading: boolean
   login: () => void
   logout: () => void
   user: User | null

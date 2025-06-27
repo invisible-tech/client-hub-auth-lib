@@ -20,6 +20,7 @@ interface User {
 type AuthContextType = {
   accessToken: string | null
   isAuthenticated: boolean
+  isLoading: boolean
   login: () => void
   logout: () => void
   user: User | null
@@ -61,17 +62,21 @@ export function ClientHubAuthProvider({
 }) {
   const [accessToken, setAccessTokenState] = useState<string | null>(null)
   const [user, setUser] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     const isCallbackRoute = window.location.pathname === "/auth/callback"
 
     if (!isCallbackRoute) return
 
+    setIsLoading(true)
+
     const params = new URLSearchParams(window.location.search)
 
     const code = params.get("code")
     if (!code) {
       toast.error("No code found in callback URL!")
+      setIsLoading(false)
       return
     }
     exchangeCodeWithTokens(code)
@@ -84,10 +89,12 @@ export function ClientHubAuthProvider({
         if (refreshToken) {
           localStorage.setItem("refresh_token", refreshToken)
         }
+        setIsLoading(false)
         window.location.assign("/")
       })
       .catch(() => {
         toast.error("Failed to exchange code for tokens")
+        setIsLoading(false)
       })
   }, [])
 
@@ -177,6 +184,7 @@ export function ClientHubAuthProvider({
   const value: AuthContextType = {
     accessToken,
     isAuthenticated: !!accessToken,
+    isLoading,
     login: () => {
       window.location.assign(
         `${JWT_ISSUER}/login/?redirect_uri=${REDIRECT_URI}`
