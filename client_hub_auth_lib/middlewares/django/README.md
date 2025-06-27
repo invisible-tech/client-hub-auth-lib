@@ -25,7 +25,6 @@ Otherwise, add the secrets to your environment variables. Example below:
 class Config:
     JWT_ISSUER = "https://identity.inv.tech"
     JWT_AUDIENCE = "*.inv.tech"
-    JWT_CURRENT_KID = "your-key-id"
 ```
 
 #### 3. Access User Information in Views
