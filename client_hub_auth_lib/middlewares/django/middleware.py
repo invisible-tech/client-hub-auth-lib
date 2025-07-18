@@ -37,11 +37,11 @@ class ClientHubAuthMiddleware:
         auth_header = request.headers.get("Authorization")
 
         if not auth_header:
-            return None
+            return self.get_response(request)
 
         auth = auth_header.split()
         if len(auth) != 2 or auth[0].lower() != "bearer":
-            return None
+            return self.get_response(request)
 
         token = auth[1]
 
