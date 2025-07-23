@@ -145,7 +145,7 @@ export function ClientHubAuthProvider({
   const aboutToExpire = (token: string, expirationBuffer = 10) => {
     const decoded = jwtDecode(token)
     if (decoded) {
-      return ((decoded.exp || 0) + expirationBuffer) * 1000 < Date.now()
+      return ((decoded.exp || 0) - expirationBuffer) * 1000 < Date.now()
     } else {
       return false
     }
