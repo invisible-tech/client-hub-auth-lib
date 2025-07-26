@@ -100,6 +100,9 @@ export function ClientHubAuthProvider({
 
   useEffect(() => {
     const getUser = async (): Promise<User | null> => {
+      if (accessToken === null) {
+        return null
+      }
       try {
         const response = await fetch(`${JWT_ISSUER}/api/user/`, {
           headers: {
