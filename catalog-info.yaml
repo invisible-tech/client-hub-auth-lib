@@ -16,7 +16,7 @@ metadata:
     image_deployment_method: Argo_CD
     knowledge_base: Notion
 spec:
-  type: library
+  type: internal tool
   lifecycle: production
   owner: infra-paved-path
   domain: core-tech
