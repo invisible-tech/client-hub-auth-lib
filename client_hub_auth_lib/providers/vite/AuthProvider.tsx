@@ -8,8 +8,16 @@ import React, {
 import { jwtDecode } from "jwt-decode"
 import { toast } from "sonner"
 
-const JWT_ISSUER = import.meta.env.VITE_JWT_ISSUER
-const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI
+function getRequiredEnvVar(name: string): string {
+  const value = import.meta.env[name]
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`)
+  }
+  return value
+}
+
+const JWT_ISSUER = getRequiredEnvVar("VITE_JWT_ISSUER")
+const REDIRECT_URI = getRequiredEnvVar("VITE_REDIRECT_URI")
 
 interface User {
   name: string
