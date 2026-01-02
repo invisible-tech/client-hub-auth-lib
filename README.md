@@ -9,3 +9,9 @@ A comprehensive authentication library that provides seamless JWT-based authenti
 - **React Provider** - Complete authentication context for React applications
 - **Token Refresh** - Automatic token refresh handling
 - **User Management** - User information retrieval and management
+
+## React Authprovider
+[Documentation](/client_hub_auth_lib/providers/vite/README.md)
+
+## Django middleware
+[Documentation](/client_hub_auth_lib/middlewares/django/README.md)

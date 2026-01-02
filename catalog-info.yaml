@@ -10,6 +10,7 @@ metadata:
     invisible.io/most-active-user: Fazle Rabbi
     invisible.io/owner-user: Matt Hardwick
     invisible.io/repo-type: Library
+    backstage.io/techdocs-ref: dir:.
   labels:
     security_scan_production: SKIP
     sensitive_data_stored: No
