@@ -13,11 +13,11 @@ metadata:
     backstage.io/techdocs-ref: dir:.
   labels:
     security_scan_production: SKIP
-    sensitive_data_stored: No
+    sensitive_data_stored: false
     image_deployment_method: Argo_CD
     knowledge_base: Notion
 spec:
   type: internal tool
   lifecycle: production
-  owner: infra-paved-path
+  owner: group:default/pavedpath
   domain: core-tech
