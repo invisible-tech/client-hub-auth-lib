@@ -13,7 +13,6 @@ metadata:
     backstage.io/techdocs-ref: dir:.
   labels:
     security_scan_production: SKIP
-    sensitive_data_stored: false
     image_deployment_method: Argo_CD
     knowledge_base: Notion
 spec:
