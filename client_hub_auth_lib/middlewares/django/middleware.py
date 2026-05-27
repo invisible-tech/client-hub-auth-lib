@@ -1,6 +1,14 @@
+import os
+
 from authlib.jose import JsonWebKey, jwt as pyJwt
+from django.conf import settings
 import requests
-from config import config
+
+try:
+    # Keep compatibility with existing config module if present
+    from config import config as file_config
+except ModuleNotFoundError:
+    file_config = None
 
 
 class ClientHubAuthMiddleware:
@@ -8,16 +16,38 @@ class ClientHubAuthMiddleware:
         self.get_response = get_response
 
     @classmethod
+    def _get_setting(cls, key):
+        """
+        Retrieve config values in priority order:
+        1) Django settings
+        2) config module (backward compatibility)
+        3) Environment variables
+        """
+        if hasattr(settings, key):
+            return getattr(settings, key)
+
+        if file_config and hasattr(file_config, key):
+            return getattr(file_config, key)
+
+        env_value = os.getenv(key)
+        if env_value is None:
+            raise RuntimeError(f"{key} is not configured in config module or environment")
+
+        return env_value
+
+    @classmethod
     def _get_jwks(cls):
         """Get the JSON web key sets from the issuer"""
-        response = requests.get(f"{config.JWT_ISSUER}/.well-known/jwks.json")
+        issuer = cls._get_setting("JWT_ISSUER")
+        response = requests.get(f"{issuer}/.well-known/jwks.json")
         response.raise_for_status()
         return response.json()
 
     def _get_user(self, token):
         """Get user info from the userinfo endpoint"""
         try:
-            userinfo_url = f"{config.JWT_ISSUER}/api/user"
+            issuer = self._get_setting("JWT_ISSUER")
+            userinfo_url = f"{issuer}/api/user"
             headers = {"Authorization": f"Bearer {token}"}
             response = requests.get(userinfo_url, headers=headers, timeout=10)
             response.raise_for_status()
@@ -52,8 +82,8 @@ class ClientHubAuthMiddleware:
                 token,
                 key_set,
                 claims_options={
-                    "iss": {"essential": True, "value": config.JWT_ISSUER},
-                    "aud": {"essential": True, "value": config.JWT_AUDIENCE},
+                    "iss": {"essential": True, "value": self._get_setting("JWT_ISSUER")},
+                    "aud": {"essential": True, "value": self._get_setting("JWT_AUDIENCE")},
                     "sub": {"essential": True},
                     "exp": {"essential": True},
                 },
